@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <http:listener-config name="sfdc-customer-order-sapi-httpListenerConfig">
+        <http:listener-connection host="${http.host}" port="${http.port}" readTimeout="${http.readTimeout}"/>
+    </http:listener-config>
+    <apikit:config name="sfdc-customer-order-sapi-config" api="sfdc-customer-order-sapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="sfdc-customer-order-sapi-main">
+        <http:listener config-ref="sfdc-customer-order-sapi-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <set-variable value='#[attributes.requestUri ++ "--" ++ attributes.remoteAddress]' doc:name="Set rlog" doc:id="daf99deb-9f15-4159-8334-1fe4dfd88dfb" variableName="rlog"/>
+		<logger level="INFO" doc:name="Start Log" doc:id="6152cc6c-771a-408b-af8d-81049b0eaded" message='#[vars.rlog]'/>
+		<apikit:router config-ref="sfdc-customer-order-sapi-config" />
+		<logger level="INFO" doc:name="End Log" doc:id="f031bf53-9544-442e-92a4-c6deb4da91a4" message='#[vars.rlog]' />
+		<error-handler ref="global-error-handler" />
+    </flow>
+    <flow name="sfdc-customer-order-sapi-console">
+        <http:listener config-ref="sfdc-customer-order-sapi-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="sfdc-customer-order-sapi-config" />
+		<error-handler ref="global-error-handler" />
+    </flow>
+    <flow name="delete:\customers\(customerId):sfdc-customer-order-sapi-config">
+        <logger level="INFO" doc:name="Start Log" doc:id="5f2e4817-cd63-42e1-9705-7704486c020b" message='#["Flow delete:\customers\(customerId) started"]'/>
+		<ee:transform doc:name="customerId">
+            <ee:variables>
+                <ee:set-variable variableName="customerId">attributes.uriParams.'customerId'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+		<flow-ref doc:name="delete-customer-by-id-flow" doc:id="fb37c7f1-de9a-47a8-95e4-71308af96b43" name="delete-customer-by-id-flow"/>
+		<logger level="INFO" doc:name="End Log" doc:id="d1c88347-2b19-437d-ab68-a935459b105f" message='#["Flow delete:\customers\(customerId) ended"]' />
+		<error-handler ref="global-error-handler" />
+    </flow>
+    <flow name="delete:\orders\(orderId):sfdc-customer-order-sapi-config">
+        <logger level="INFO" doc:name="Start Log" doc:id="cfcb093f-8a37-45fe-bb3a-8119e0110f23" message='#["Flow delete:\orders\(orderId) started"]' />
+		<ee:transform doc:name="orderId">
+            <ee:variables>
+                <ee:set-variable variableName="orderId">attributes.uriParams.'orderId'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+		<flow-ref doc:name="delete-order-by-id-flow" doc:id="a54d8556-40d8-425b-8f25-7ee12fa5f9a5" name="delete-order-by-id-flow"/>
+		<logger level="INFO" doc:name="End Log" doc:id="ce83031a-f743-463f-844f-b1c36cc39f95" message='#["Flow delete:\orders\(orderId) ended"]' />
+		<error-handler ref="global-error-handler" />
+    </flow>
+    <flow name="get:\customers\(customerId):sfdc-customer-order-sapi-config">
+        <logger level="INFO" doc:name="Start Log" doc:id="4f70ea36-09da-42da-8d1d-fc57f6907036" message='#["Flow get:\customers\(customerId) started"]' />
+		<ee:transform doc:name="customerId">
+            <ee:variables>
+                <ee:set-variable variableName="customerId">attributes.uriParams.'customerId'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+		<flow-ref doc:name="get-customer-details-flow" doc:id="cfacda01-bba3-45af-9735-7417c461af72" name="get-customer-details-flow"/>
+		<logger level="INFO" doc:name="End Log" doc:id="de74b699-c5f4-418b-ad32-96fd435a071d" message='#["Flow get:\customers\(customerId) ended"]' />
+    </flow>
+    <flow name="get:\orders\(orderId):sfdc-customer-order-sapi-config">
+        <logger level="INFO" doc:name="Start Log" doc:id="dc3436b4-8ab9-4f86-95ad-eac0ceef789b" message='#["Flow get:\orders\(orderId) started"]' />
+		<ee:transform doc:name="orderId">
+            <ee:variables>
+                <ee:set-variable variableName="orderId">attributes.uriParams.'orderId'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+		<flow-ref doc:name="get-order-details-flow" doc:id="fdb02a01-fd19-4b16-b041-eb5e8808b167" name="get-order-details-flow"/>
+		<logger level="INFO" doc:name="End Log" doc:id="32eadbcb-f404-489a-ac72-221e8fe59e8b" message='#["Flow get:\orders\(orderId) ended"]' />
+    </flow>
+    <flow name="get:\customers:sfdc-customer-order-sapi-config">
+		<logger level="INFO" doc:name="Start Log" doc:id="a824d8cf-694b-4e5d-bbe6-48c4eb8b96c1" message='#["Flow get:\customers started"]' />
+		<flow-ref doc:name="get-customer-details-flow" doc:id="21a652cd-ff6d-4f58-ac32-d53c714bc85b" name="get-customer-details-flow"/>
+		<logger level="INFO" doc:name="End Log" doc:id="4329e318-b06e-4411-b37d-47514f1fde1f" message='#["Flow get:\customers ended"]' />
+    </flow>
+    <flow name="get:\orders:sfdc-customer-order-sapi-config">
+		<logger level="INFO" doc:name="Start Log" doc:id="a9010ce2-86ed-4734-8aec-7aeab6040686" message='#["Flow get:\orders started"]' />
+		<flow-ref doc:name="get-order-details-flow" doc:id="75119aef-6df4-4557-b8d9-2620baeee99a" name="get-order-details-flow"/>
+		<logger level="INFO" doc:name="End Log" doc:id="a5f69c3b-c034-4413-b94e-b60b4fd06679" message='#["Flow get:\orders ended"]' />
+    </flow>
+    <flow name="post:\customers:application\json:sfdc-customer-order-sapi-config">
+		<logger level="INFO" doc:name="Start Log" doc:id="067ff406-eb7a-465d-871b-e41d4539c9e9" message='#["Flow post:\customers started"]' />
+		<flow-ref doc:name="create-customer-flow" doc:id="7cb9dab4-f675-42a7-8f81-3bbd97fc3482" name="create-customer-flow"/>
+		<logger level="INFO" doc:name="End Log" doc:id="45866a2e-b1ca-4a84-a752-63bad260e53e" message='#["Flow post:\customers ended"]' />
+		<error-handler ref="global-error-handler" />
+    </flow>
+    <flow name="post:\orders:application\json:sfdc-customer-order-sapi-config">
+		<logger level="INFO" doc:name="Start Log" doc:id="3d6c328d-2cfd-4884-9cc7-ab214f67eb26" message='#["Flow post:\orders started"]' />
+		<flow-ref doc:name="create-order-flow" doc:id="34b4d599-0475-4f0b-8185-0ffabb8396fb" name="create-order-flow"/>
+		<logger level="INFO" doc:name="End Log" doc:id="26d34eed-eb75-472f-a0bf-57f8cf807c05" message='#["Flow post:\orders ended"]' />
+		<error-handler ref="global-error-handler" />
+    </flow>
+</mule>

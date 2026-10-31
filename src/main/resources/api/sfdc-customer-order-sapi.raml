@@ -1,0 +1,182 @@
+#%RAML 1.0
+title: sfdc-customer-order-sapi
+version: v1
+baseUri: https://{env}.api.company.com/sfdc-customer-order-sapi/api/{version}
+baseUriParameters:
+  env:
+    description: Deployment environment
+    enum: [dev, qa, prod]
+
+mediaType: application/json
+
+
+documentation:
+  - title: Overview
+    content: |
+      System API that exposes CRUD operations for Customer and Order objects
+      backed directly by Salesforce (Account/Contact used as Customer, and a
+      custom/standard Order object). This is the ONLY layer permitted to talk
+      to Salesforce. Consumed exclusively by the Process API
+      (sfdc-customer-order-papi). Client ID Enforcement is applied on this
+      layer so only the Process API (and no other caller) can invoke it.
+
+types:
+  Customer: !include types/customer.raml
+  Order: !include types/order.raml
+  Error: !include types/error.raml
+
+traits:
+  errorResponses: !include traits/trait.raml
+  client-id-required: !include traits/client-id-required.raml
+
+securitySchemes:
+  client_id_enforcement:
+    type: Pass Through
+    description: |
+      Documents the Anypoint Client ID Enforcement policy applied at the API
+      Manager / Flex Gateway layer for this System API. Only the Process API's
+      registered client_id and client_secret may invoke this API — no other
+      caller is permitted.
+    describedBy:
+      headers:
+        client_id:
+          type: string
+          required: true
+          description: Application client ID issued via API Manager
+        client_secret:
+          type: string
+          required: true
+          description: Application client secret issued via API Manager
+      responses:
+        401:
+          description: Unauthorized — missing or invalid client_id / client_secret
+          body:
+            application/json:
+              type: Error
+        403:
+          description: Forbidden — valid credentials but this client is not authorized for this API
+          body:
+            application/json:
+              type: Error
+
+securedBy: [client_id_enforcement]
+
+/customers:
+  displayName: Customers
+  get:
+    description: Retrieve a list of customers from Salesforce
+    is: [errorResponses]
+    queryParameters:
+      email?:
+        type: string
+        description: Filter by exact email match
+      lastName?:
+        type: string
+    responses:
+      200:
+        body:
+          application/json:
+            type: Customer
+            example: !include examples/get-customer.json
+  post:
+    description: Create a new customer record in Salesforce
+    is: [errorResponses]
+    body:
+      application/json:
+        type: Customer
+        example: !include examples/post-customer.json
+          
+    responses:
+      201:
+        body:
+          application/json:
+            type: object
+            example:
+              {
+                customersId: "0031U000009abcDEF",
+                message: "Customer Created Sucessfully"
+              }
+
+  /{customerId}:
+    uriParameters:
+      customerId:
+        type: string
+        description: Salesforce record Id (Account/Contact Id)
+    get:
+      description: Retrieve a single customer by Salesforce Id
+      is: [errorResponses]
+      responses:
+        200:
+          body:
+            application/json:
+              type: Customer
+              example: !include examples/get-customer.json
+    delete:
+      description: Delete a customer record from Salesforce
+      is: [errorResponses]
+      responses:
+        204:
+          body:
+            application/json:
+                type: string
+                example: "Customer deleted Sucessfully"
+                  
+
+/orders:
+  displayName: Orders
+  get:
+    description: Retrieve a list of orders from Salesforce
+    is: [errorResponses]
+    queryParameters:
+      customerId?:
+        type: string
+      status?:
+        type: string
+        enum: [Draft, Activated, Cancelled]
+    responses:
+      200:
+        body:
+          application/json:
+            type: !include /types/order.raml
+            example: !include /examples/post-order.json
+                
+  post:
+    description: Create a new order record in Salesforce
+    is: [errorResponses]
+    body:
+      application/json:
+        type: Order
+        example: !include examples/post-order.json
+    responses:
+      201:
+        body:
+          application/json:
+            type: object
+            example:
+              {
+                orderId: "0031U000009abcDEF",
+                message: "Customer Created Sucessfully"
+              }
+  /{orderId}:
+    uriParameters:
+      orderId:
+        type: string
+        description: Salesforce Order record Id
+    get:
+      description: Retrieve a single order by Salesforce Id
+      is: [errorResponses]
+      responses:
+        200:
+          body:
+            application/json:
+              type: Order
+    delete:
+      description: Delete an order record from Salesforce
+      is: [errorResponses]
+      responses:
+        204:
+          body:
+            application/json:
+                type: string
+                example: "Order deleted Sucessfully"
+                  

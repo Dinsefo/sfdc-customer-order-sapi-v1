@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<flow name="delete-order-by-id-flow" doc:id="e2e0f9fd-d540-48cb-8c73-71dc57f9ee7f" >
+		<ee:transform doc:name="orderId mapping" doc:id="1ec3f713-bbf0-42fd-acc3-df21b2dec0ee" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[vars.orderId]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:delete doc:name="Delete Order" doc:id="2ef5f331-fc60-45e4-92ae-34684d5a08f8" config-ref="Salesforce_Config">
+			<reconnect frequency="${reconnection.frequency}" count="${reconnection.attempts}" />
+		</salesforce:delete>
+		<ee:transform doc:name="Status check" doc:id="c6ecce15-0412-488a-8888-3968b2969e85" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var result = payload.items[0]
+---
+if (result.successful and result.payload.success)
+	{
+		success: true,
+		message: "Order deleted successfully"
+	}
+else
+	{
+		success: false,
+		message: "Order deletion rejected by Salesforce",
+		errors: result.payload.errors default [result.message default "Unknown error"]
+	}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="69dc5769-ad5b-4c16-875f-355367fb190b" >
+			<when expression="#[payload.success == false]">
+				<set-variable value="#[payload]" doc:name="Set errorMessage" doc:id="6e97bfcf-9436-4f1e-a1ce-df9ca53a6bbe" variableName="errorMessage"/>
+				<raise-error doc:name="Raise error" doc:id="33e1a075-1613-4f19-a52a-bc9ad3153ac7" type="API:ORDER" description="Order Deletion Failed"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Success Log" doc:id="e1769225-89bd-4c14-96dc-024b5c7b25c8" message="#[payload]"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="create-order-flow" doc:id="620ffb4c-137d-4cb4-86e3-e561e9f3ea67" >
+		<set-variable value="#[payload]" doc:name="Set orderDetails" doc:id="05142860-ce87-4f69-9008-55f738319dd4" variableName="orderDetails"/>
+		<ee:transform doc:name="Transform Message" doc:id="96053adc-c011-4190-b2b5-2f0352ec14f5">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[    {
+        "orderDate__c": payload.orderDate as Date,
+        "unitPrice__c": payload.items[0].unitPrice,
+        "quantity__c": payload.items[0].quantity,
+        "customerId__c": payload.customerId,
+        "totalAmount__c": payload.totalAmount,
+        "status__c": payload.status,
+        "productCode__c": payload.items[0].productCode
+    }]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create type="order__c" doc:name="Create Order" doc:id="b7849fd7-a5f3-4131-8613-bbc19519df7f" config-ref="Salesforce_Config"/>
+		<ee:transform doc:name="status check" doc:id="2fed21f3-d4c3-4b26-82ac-64acfb9cbadc" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var result = payload.items[0]
+---
+if (result.successful and result.payload.success)
+	{
+		success: true,
+		message: "Order created successfully"
+	}
+else
+	{
+		success: false,
+		message: "Order creation rejected by Salesforce",
+		errors: result.payload.errors default [result.message default "Unknown error"]
+	}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="a10b1f6c-579e-4e56-b18d-13999473b67d" >
+			<when expression="#[payload.success == false]">
+				<set-variable value="#[payload]" doc:name="Set errorMessage" doc:id="c01947b6-ad79-4824-9f09-6da40c311d43" variableName="errorMessage" />
+				<raise-error doc:name="Raise error" doc:id="9722ba6f-003d-48e6-9f71-17fe1e54adf1" type="API:ORDER_CREATION" description="Order Creation Failed" />
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Success Log" doc:id="9be1f52d-904a-4359-a181-2d27aad0676f" message="#[payload]" />
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="get-order-details-flow" doc:id="39ee0a11-a0e1-4414-abb2-477d2a522679" >
+		<ee:transform doc:name="sfQuery" doc:id="d17d078a-146c-43b5-87bb-7160505ef5e3" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="sfQuery" ><![CDATA[%dw 2.0
+output application/json
+---
+if (!isEmpty(vars.orderId default "")) 
+"SELECT customerId__c,Id,orderDate__c,productCode__c,quantity__c,status__c,totalAmount__c,unitPrice__c FROM order__c where Id  ='" ++ vars.orderId ++ "'"
+else
+"SELECT customerId__c,Id,orderDate__c,productCode__c,quantity__c,status__c,totalAmount__c,unitPrice__c FROM order__c"
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<salesforce:query doc:name="Query Order Data" doc:id="8a05605c-92ca-481e-aad4-7d7557c16e9d" config-ref="Salesforce_Config">
+			<reconnect frequency="${reconnection.frequency}" count="${reconnection.attempts}" />
+			<salesforce:salesforce-query ><![CDATA[#[vars.sfQuery]]]></salesforce:salesforce-query>
+		</salesforce:query>
+		<ee:transform doc:name="Order Data" doc:id="e2edf0ef-8ccf-417d-af2b-05a1183b47a4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

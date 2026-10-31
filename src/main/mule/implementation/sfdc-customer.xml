@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<flow name="delete-customer-by-id-flow" doc:id="b1d9afe6-8540-4307-b5d4-2422a29093e3" >
+		<ee:transform doc:name="customerId mapping" doc:id="b3de548e-f726-4b96-9e0d-70c6c1aec47e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[vars.customerId]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:delete doc:name="Delete Customer" doc:id="df78316b-2d3c-48fc-a8af-1cff4a4c3a00" config-ref="Salesforce_Config">
+			<reconnect frequency="${reconnection.frequency}" count="${reconnection.attempts}"/>
+		</salesforce:delete>
+		<ee:transform doc:name="Status check" doc:id="0caf0348-1a91-452e-855d-a06aadd9b9ef" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var result = payload.items[0]
+---
+if (result.successful and result.payload.success)
+	{
+		success: true,
+		message: "Customer deleted successfully"
+	}
+else
+	{
+		success: false,
+		message: "Delete rejected by Salesforce",
+		errors: result.payload.errors default [result.message default "Unknown error"]
+	}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="9109e8ae-4ade-4bd5-af08-48709c292052" >
+			<when expression="#[payload.success == false]">
+				<set-variable value="#[payload]" doc:name="Set errorMessage" doc:id="f528b49a-dc28-4606-b4be-0984a55cb308" variableName="errorMessage"/>
+				<raise-error doc:name="Raise error" doc:id="11fe8698-afda-4bac-a790-08a12c7f8a58" type="API:VALIDATION" description="Customer Deletion Failed"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Success Log" doc:id="8801ebd2-3cb5-4faf-a2fa-f62dc742ca4f" message="#[payload]" />
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="create-customer-flow" doc:id="bfd21051-af12-42da-9b25-7fc4e69cba2c" >
+		<set-variable value="#[payload]" doc:name="Set customerData" doc:id="aef4700c-a452-457a-933b-705117f9c968" variableName="customerData"/>
+		<ee:transform doc:name="Transform Message" doc:id="7d9d0adf-77bd-43d8-8f47-2dbb0a1a328e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	"CustomerType__c": payload.customerType,
+	"CustomerId__c": payload.customerId
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create type="SFCustomer__c" doc:name="Create Customer" doc:id="0f7edf1d-b5e0-43c3-b74d-ed25b7c30b42" config-ref="Salesforce_Config"/>
+		<ee:transform doc:name="Status check" doc:id="47f364c1-e39f-41e5-8d56-febf67e83c6f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var result = payload.items[0]
+---
+if (result.successful and result.payload.success)
+	{
+		success: true,
+		message: "Customer created successfully"
+	}
+else
+	{
+		success: false,
+		message: "Customer creation rejected by Salesforce",
+		errors: result.payload.errors default [result.message default "Unknown error"]
+	}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="56cef054-84b3-4e4c-8fe6-ee237074d809" >
+			<when expression="#[payload.success == false]">
+				<set-variable value="#[payload]" doc:name="Set errorMessage" doc:id="e75b5e06-df59-428f-85d3-96c4231f87ed" variableName="errorMessage"/>
+				<raise-error doc:name="Raise error" doc:id="631fe84a-8b00-4e1a-9b58-07ef99e602bf" type="API:CUSTOMER" description="Customer Creation Failed"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Success Log" doc:id="a998a603-06f3-4e45-8ea6-df9218ffdd19" message="#[payload]"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="get-customer-details-flow" doc:id="0a3cb514-7956-4962-af15-2ef46e524455" >
+		<ee:transform doc:name="sfQuery" doc:id="ad7aa85c-9cb9-4e22-887e-841c448d4f9a" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="sfQuery" ><![CDATA[%dw 2.0
+output application/json
+---
+if (!isEmpty(vars.customerId default "")) 
+"SELECT Id,CustomerId__c,CustomerType__c,EarlierOrder__c,RecentOrder__c,TotalOrders__c,TotalPrice__c FROM SFCustomer__c where Id ='" ++ vars.customerId ++ "'"
+else
+"SELECT Id,CustomerId__c,CustomerType__c,EarlierOrder__c,RecentOrder__c,TotalOrders__c,TotalPrice__c FROM SFCustomer__c"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<salesforce:query doc:name="Query Customer Data" doc:id="f1698538-62dd-40f6-9916-8578daec5617" config-ref="Salesforce_Config">
+					<reconnect frequency="${reconnection.frequency}" count="${reconnection.attempts}" />
+			<salesforce:salesforce-query><![CDATA[#[vars.sfQuery]]]></salesforce:salesforce-query>
+				</salesforce:query>
+		<ee:transform doc:name="Customer Data" doc:id="2c3c50cd-f945-4e27-b1f3-76d661ff1f97" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

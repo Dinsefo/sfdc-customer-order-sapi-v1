@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="0a4d1581-010b-4fcb-9391-2df579a896d8" >
+		<salesforce:jwt-connection consumerKey="${secure::sf.consumerKey}" keyStore="${secure::sf.keystorePath}" storePassword="${secure::sf.keystorePassword}" certificateAlias="${secure::sf.alias}" principal="${secure::sf.principal}" tokenEndpoint="${secure::sf.tokenEndpoint}">
+			<reconnection failsDeployment="true" >
+				<reconnect frequency="${reconnection.frequency}" count="${reconnection.attempts}" />
+			</reconnection>
+		</salesforce:jwt-connection>
+	</salesforce:sfdc-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="40c67d56-9547-4835-8217-3acb852eb5b8" file="config/common-config.yaml" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="dccd1588-6b1d-4611-aa5d-724ce5c04602" file="config/${mule.env}-config.yaml" key="${securekey}" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+	<global-property doc:name="Global Property" doc:id="bfc0e58f-8a41-4f55-8831-b740590beb6e" name="mule.env" value="dev" />
+	<global-property doc:name="Global Property" doc:id="85e5ceb7-5a80-429e-bd59-c39c2d017a4e" name="securekey" value="mulesecurekey" />
+	<global-property doc:name="Global Property" doc:id="06d166b1-22cf-4367-b075-a5babad89c8a" name="anypoint.platform.gatekeeper" value="disabled" />
+</mule>

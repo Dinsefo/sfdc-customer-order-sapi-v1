@@ -1,0 +1,1 @@
+"SELECT Id,CustomerId__c,CustomerType__c,EarlierOrder__c,RecentOrder__c,TotalOrders__c,TotalPrice__c FROM SFCustomer__c where Id ='a04g50000020GwTAAU'"
