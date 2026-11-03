@@ -142,3 +142,9 @@ Breaking changes should be introduced through a new major API version.
 
 Support and Maintenance
 For technical support, integration issues, or enhancement requests, follow the organization's established development and support procedures.
+
+# Contact
+For inquiries, collaborations, or feedback, please contact:
+
+Dinsefo Ali
+Email: dinsefo.ali@gmail.com
