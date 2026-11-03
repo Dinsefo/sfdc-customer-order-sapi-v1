@@ -4,16 +4,27 @@
 
 	<!-- <groupId>com.mycompany</groupId> -->
 	<groupId>${business.group.id}</groupId>
+<<<<<<< HEAD
 	<artifactId>sfdc-customer-order-sapi-dev</artifactId>
 	<version>1.0.0</version>
 	<packaging>mule-application</packaging>
 
 	<name>sfdc-customer-order-sapi-v1-dev</name>
+=======
+	<artifactId>sfdc-customer-order-sapi-v1</artifactId>
+	<version>1.0.0</version>
+	<packaging>mule-application</packaging>
+
+	<name>sfdc-customer-order-sapi-v1</name>
+>>>>>>> 0e41286 (Update POM.XML file)
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0e41286 (Update POM.XML file)
 		<app.runtime>4.10.0</app.runtime>
 		<mule.maven.plugin.version>4.10.1</mule.maven.plugin.version>
 		<munit.version>3.6.1</munit.version>
@@ -153,7 +164,12 @@
 	<distributionManagement>
 		<repository>
 			<id>anypoint-exchange-v3</id>
+<<<<<<< HEAD
 			<name>Corporate Repository</name>
+=======
+			<!-- <name>Corporate Repository</name> -->
+			<name>Anypoint Exchange</name>
+>>>>>>> 0e41286 (Update POM.XML file)
 			<url>https://maven.anypoint.mulesoft.com/api/v3/organizations/${business.group.id}/maven</url>
 			<layout>default</layout>
 		</repository>
@@ -186,4 +202,8 @@
 		</pluginRepository>
 	</pluginRepositories>
 
+<<<<<<< HEAD
 </project>
+=======
+</project>
+>>>>>>> 0e41286 (Update POM.XML file)
