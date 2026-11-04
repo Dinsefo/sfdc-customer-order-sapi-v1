@@ -1,0 +1,18 @@
+{
+  "customerId": "0011U00000XyzABC",
+  "orderDate": "2026-08-26",
+  "status": "Draft",
+  "totalAmount": 249.99,
+  "items": [
+    {
+      "productCode": "SKU-1001",
+      "quantity": 2,
+      "unitPrice": 74.99
+    },
+    {
+      "productCode": "SKU-2002",
+      "quantity": 1,
+      "unitPrice": 100.01
+    }
+  ]
+}

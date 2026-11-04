@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<munit:config name="sfdc-customer-order-sapi-test-suite.xml" />
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="5ef92b3a-39db-4ada-a712-93d2bd706612" >
+		<http:request-connection host="0.0.0.0" port="8081" />
+	</http:request-config>
+	<munit:test name="sfdc-customer-order-sapi-test-suite-sfdc-customer-order-sapi-mainTest" doc:id="7152da3b-1922-43d7-a017-ba96e7fa9abb" description="Test" expectedErrorType="MULE:UNKNOWN">
+		<munit:behavior >
+			<munit:set-event doc:name="Set Event" doc:id="c5d37318-ab7c-4b97-a956-b0d7fe2ce1cc" >
+				<munit:attributes value='#[output application/json&#10;---&#10;{&#10;  "headers": {&#10;    "user-agent": "PostmanRuntime/7.51.1",&#10;    "accept": "*/*",&#10;    "postman-token": "97acf3a8-b8f3-4ff5-9f68-04e7c28ac1e3",&#10;    "host": "localhost:8081",&#10;    "accept-encoding": "gzip, deflate, br",&#10;    "connection": "keep-alive"&#10;  },&#10;  "clientCertificate": null,&#10;  "method": "POST",&#10;  "scheme": "http",&#10;  "queryParams": {},&#10;  "requestUri": "/api/customers/a04g50000020GwTAAU",&#10;  "queryString": "",&#10;  "version": "HTTP/1.1",&#10;  "maskedRequestPath": "/customers/a04g50000020GwTAAU",&#10;  "listenerPath": "/api/*",&#10;  "localAddress": "/127.0.0.1:8081",&#10;  "relativePath": "/api/customers/a04g50000020GwTAAU",&#10;  "uriParams": {&#10;    "customerId": "a04g50000020GwTAAU"&#10;  },&#10;  "rawRequestUri": "/api/customers/a04g50000020GwTAAU",&#10;  "rawRequestPath": "/api/customers/a04g50000020GwTAAU",&#10;  "remoteAddress": "/127.0.0.1:56271",&#10;  "requestPath": "/api/customers/a04g50000020GwTAAU"&#10;}]' />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to sfdc-customer-order-sapi-main" doc:id="e1a5d7f6-f91c-439e-ae3e-7b0d655af669" name="sfdc-customer-order-sapi-main"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:verify-call doc:name="Verify call for APIKit Router" doc:id="dd0297ae-8335-4acd-8ae0-80b35c3ccc82" processor="apikit:router" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="sfdc-customer-order-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="sfdc-customer-order-sapi-test-suite-sfdc-customer-order-sapi-mainTest2" doc:id="68e1e4cb-131a-4f84-85b5-bf6f9189c5d6" description="Test" expectedErrorType="ANY" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Event" doc:id="d600428b-8dc9-45a3-922a-54a7f25908e4" >
+				<munit:payload value='#[output application/json&#10;---&#10;[{&#10;    "firstName": "JHON",&#10;    "lastName": "SNOW",&#10;    "email": "john@aexample.com",&#10;    "phone": "+91-9000000000",&#10;    "address": "UK - 29-29-2009",&#10;    "customerId": "12351746134",&#10;    "customerType": "Service"&#10;}]]' />
+				<munit:attributes value='#[output application/json&#10;---&#10;{&#10;  "headers": {&#10;    "user-agent": "PostmanRuntime/7.51.1",&#10;    "accept": "*/*",&#10;    "postman-token": "97acf3a8-b8f3-4ff5-9f68-04e7c28ac1e3",&#10;    "host": "localhost:8081",&#10;    "accept-encoding": "gzip, deflate, br",&#10;    "connection": "keep-alive"&#10;  },&#10;  "clientCertificate": null,&#10;  "method": "GET",&#10;  "scheme": "http",&#10;  "queryParams": {},&#10;  "requestUri": "/api/cust/a04g50000020GwTAAU",&#10;  "queryString": "",&#10;  "version": "HTTP/1.1",&#10;  "maskedRequestPath": "/cust/a04g50000020GwTAAU",&#10;  "listenerPath": "/api/*",&#10;  "localAddress": "/127.0.0.1:8081",&#10;  "relativePath": "/api/cust/a04g50000020GwTAAU",&#10;  "uriParams": {&#10;    "customerId": "a04g50000020GwTAAU"&#10;  },&#10;  "rawRequestUri": "/api/cust/a04g50000020GwTAAU",&#10;  "rawRequestPath": "/api/cust/a04g50000020GwTAAU",&#10;  "remoteAddress": "/127.0.0.1:56271",&#10;  "requestPath": "/api/cust/a04g50000020GwTAAU"&#10;}]' />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to sfdc-customer-order-sapi-main" doc:id="393bd9e6-18ef-4e23-a9ab-5df923d868a2" name="sfdc-customer-order-sapi-main" />
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call for APIKit Router" doc:id="6b068086-598c-4ecb-b12b-edc7d41884c9" processor="apikit:router" atLeast="1" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="sfdc-customer-order-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="post:\customers:application\json:sfdc-customer-order-sapi-config-test-error" doc:id="68d7e443-b551-411a-821f-5ae63e1f9bf2" expectedErrorType="API:CUSTOMER">
+		<munit:behavior >
+			<munit-tools:spy doc:name="Spy create-customer-flow" doc:id="22b7de0c-05ad-40ea-80c4-d5004e707591" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="7cb9dab4-f675-42a7-8f81-3bbd97fc3482" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:before-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="b2b8250a-17fc-4aff-b8aa-1ca6eb0f1155" message="The payload does not match" >
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import postcustomersapplicationjsonsfdccustomerordersapiconfigtest::spy_assert_payload
+---
+spy_assert_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+					<munit-tools:assert doc:name="Assert attributes" doc:id="e5d50a83-e73d-41ad-a318-fabd3375cd04" message="The attributes do not match" >
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import postcustomersapplicationjsonsfdccustomerordersapiconfigtest::spy_assert_attributes
+---
+spy_assert_attributes::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+					<munit-tools:assert doc:name="Assert variables" doc:id="812f7c2a-78c2-4ebb-bfdf-116475587289" message="The variables do not match" >
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import postcustomersapplicationjsonsfdccustomerordersapiconfigtest::spy_assert_variables
+---
+spy_assert_variables::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:before-call>
+				<munit-tools:after-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="878be0ce-7196-4566-a2bc-3fddd34d317d" message="The payload does not match" >
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import postcustomersapplicationjsonsfdccustomerordersapiconfigtest::spy_assert_payload1
+---
+spy_assert_payload1::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+					<munit-tools:assert doc:name="Assert variables" doc:id="c0ca2850-082c-4360-a579-06e8f594e903" message="The variables do not match" >
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import postcustomersapplicationjsonsfdccustomerordersapiconfigtest::spy_assert_variables1
+---
+spy_assert_variables1::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:after-call>
+			</munit-tools:spy>
+			<munit:set-event doc:name="Set Input" doc:id="997174f3-6c66-4550-9fd1-f18d30c5f7d1" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://postcustomersapplicationjsonsfdccustomerordersapiconfigtest\set-event_payload2.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://postcustomersapplicationjsonsfdccustomerordersapiconfigtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://postcustomersapplicationjsonsfdccustomerordersapiconfigtest\set-event_variable_.dwl')]" />
+					<munit:variable key="rlog" value="#[output application/java --- readUrl('classpath://postcustomersapplicationjsonsfdccustomerordersapiconfigtest\set-event_variable_1.dwl')]" encoding="UTF-8" mediaType="application/java" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to post:\customers:application\json:sfdc-customer-order-sapi-config" doc:id="58dbff99-7246-4679-92ae-c95c10ce6c32" name="post:\customers:application\json:sfdc-customer-order-sapi-config" />
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="66abcc3b-56fe-40e5-ac8f-7dab372f1ad4" message="The payload does not match" >
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import postcustomersapplicationjsonsfdccustomerordersapiconfigtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+			<munit-tools:verify-call doc:name="Verify End Log" doc:id="83c38e5f-b662-44ec-82d5-d86f4ef5dfdb" processor="logger" times="1" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="45866a2e-b1ca-4a84-a752-63bad260e53e" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify create-customer-flow" doc:id="9c24bb25-7d80-46c2-acc3-a37fc408cc44" processor="flow-ref" times="1" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="7cb9dab4-f675-42a7-8f81-3bbd97fc3482" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="post:\orders:application\json:sfdc-customer-order-sapi-config-test-error" doc:id="ecc5b530-cf80-4ee8-ab84-9a29e3380ee7" expectedErrorType="API:ORDER_CREATION">
+		<munit:behavior >
+			<munit-tools:spy doc:name="Spy create-order-flow" doc:id="a29cd563-7655-4d36-a36f-c7e6f1c87ce2" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="34b4d599-0475-4f0b-8185-0ffabb8396fb" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:before-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="fa186d37-031a-4d02-8cbe-2dfa6bffb3ae" message="The payload does not match" >
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import postordersapplicationjsonsfdccustomerordersapiconfigtest::spy_assert_payload1
+---
+spy_assert_payload1::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+					<munit-tools:assert doc:name="Assert attributes" doc:id="b88457f5-0d43-4b2c-9b71-1ae7bb16429d" message="The attributes do not match" >
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import postordersapplicationjsonsfdccustomerordersapiconfigtest::spy_assert_attributes1
+---
+spy_assert_attributes1::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+					<munit-tools:assert doc:name="Assert variables" doc:id="f60a5e91-c27e-4235-8aeb-bd95fd54a6d6" message="The variables do not match" >
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import postordersapplicationjsonsfdccustomerordersapiconfigtest::spy_assert_variables2
+---
+spy_assert_variables2::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:before-call>
+				<munit-tools:after-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="f6fe6f51-a275-46f6-beb7-abcdd89620ac" message="The payload does not match" >
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import postordersapplicationjsonsfdccustomerordersapiconfigtest::spy_assert_payload2
+---
+spy_assert_payload2::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+					<munit-tools:assert doc:name="Assert variables" doc:id="741cc1ed-db49-4fdc-a9a5-57e997960104" message="The variables do not match" >
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import postordersapplicationjsonsfdccustomerordersapiconfigtest::spy_assert_variables3
+---
+spy_assert_variables3::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:after-call>
+			</munit-tools:spy>
+			<munit:set-event doc:name="Set Input" doc:id="ef86691e-1402-4363-a01c-900f7af41c0d" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://postordersapplicationjsonsfdccustomerordersapiconfigtest\set-event_payload2.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://postordersapplicationjsonsfdccustomerordersapiconfigtest\set-event_attributes1.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://postordersapplicationjsonsfdccustomerordersapiconfigtest\set-event_variable_2.dwl')]" />
+					<munit:variable key="rlog" value="#[output application/java --- readUrl('classpath://postordersapplicationjsonsfdccustomerordersapiconfigtest\set-event_variable_3.dwl')]" encoding="UTF-8" mediaType="application/java" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to post:\orders:application\json:sfdc-customer-order-sapi-config" doc:id="dee08b52-89eb-4bc8-a72e-990bbc611b05" name="post:\orders:application\json:sfdc-customer-order-sapi-config" />
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="df7e269c-209e-457f-8683-68ba3502c7c2" message="The payload does not match" >
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import postordersapplicationjsonsfdccustomerordersapiconfigtest::assert_expression_payload1
+---
+assert_expression_payload1::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+			<munit-tools:verify-call doc:name="Verify End Log" doc:id="a8d128a6-d3fd-4bdc-bfbb-6c1b4f9fb887" processor="logger" times="1" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="26d34eed-eb75-472f-a0bf-57f8cf807c05" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify create-order-flow" doc:id="dbd4b7c9-4fc2-43a8-9ada-d62c4c69de65" processor="flow-ref" times="1" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="34b4d599-0475-4f0b-8185-0ffabb8396fb" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

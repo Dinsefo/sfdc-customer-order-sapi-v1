@@ -1,0 +1,10 @@
+sf:
+  consumerKey:  "![Ck6vhHgAkBz7ZMsooR8flgAq+oWydZeQA6R/oH83VUlGhWKamEBP0tsig5U0zwx7yVknn7ryiCe8scSJo6oc+h0uuNF4CYlAZaVTPWIa9yV+tTDkTcsCrQ==]"
+  keystorePath: "certs/salesforce-dev.jks"
+  keystorePassword: "![YeYrbSZtO4BxyReY0+PNwg==]"
+  alias: "sf"
+  principal: "![HczvRzekMYYQeApwPF2+0X0osI+7pvhkqcxtT1xzeLaxMyqJ8rHN6cRsUK8jkpZL/0qPRr/kMAM=]"
+  tokenEndpoint: "https://login.salesforce.com/services/oauth2/token"
+  
+api:
+  id: "21213148"

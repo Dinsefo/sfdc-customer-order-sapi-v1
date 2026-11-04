@@ -1,0 +1,22 @@
+#%RAML 1.0 DataType
+type: object
+properties:
+  id?:
+    type: string
+    description: Salesforce record Id (read-only, system-generated)
+  firstName:
+    type: string
+  lastName:
+    type: string
+  email:
+    type: string
+    pattern: ^[^@\s]+@[^@\s]+\.[^@\s]+$
+  phone:
+    type: string
+  accountId?:
+    type: string
+    description: Related Salesforce Account Id, if Contact is used as Customer
+  address:
+    type: string
+    description: address
+

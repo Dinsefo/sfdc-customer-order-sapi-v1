@@ -1,0 +1,8 @@
+http:
+  host: "0.0.0.0"
+  port: "8081"
+  readTimeout: "30000"
+
+reconnection:
+  frequency: "5000"
+  attempts: "3"

@@ -1,0 +1,1 @@
+"SELECT CreatedDate,CustomerStatusType,Id,LastReferencedDate,LastViewedDate,Name,OwnerId FROM Customer"

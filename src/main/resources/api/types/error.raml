@@ -1,0 +1,24 @@
+#%RAML 1.0 DataType
+type: object
+properties:
+  errorCode:
+    type: string
+    description: |
+      Namespaced Mule error type, e.g. SFDC-CUSTOMER-ORDER-SAPI:CONNECTIVITY,
+      HTTP:NOT_FOUND, APIKIT:BAD_REQUEST, SFDC-CUSTOMER-ORDER-SAPI:NOT_FOUND
+  message:
+    type: string
+    description: Human-readable description of the error
+  correlationId:
+    type: string
+    description: Mule event correlation ID — propagate this back to the caller for traceability
+  timestamp:
+    type: datetime
+  detail?:
+    type: string
+    description: Optional stack-trace-free technical detail, useful for support teams
+example:
+  errorCode: "SFDC-CUSTOMER-ORDER-SAPI:CONNECTIVITY"
+  message: "Unable to connect to Salesforce after configured retries"
+  correlationId: "7f3e9c10-2b1a-4e77-9f0a-1c2d3e4f5678"
+  timestamp: "2026-08-26T10:15:30.000Z"
