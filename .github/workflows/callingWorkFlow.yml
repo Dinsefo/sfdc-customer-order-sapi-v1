@@ -22,7 +22,7 @@ on:
 
 jobs:
   pipeline:
-    uses: Dinsefo/common-pipeline/.github/workflows/mulesoft-cicd-pipeline.yml@main
+    uses: Dinsefo/common-pipeline-code/.github/workflows/mulesoft-cicd-pipeline.yml@main
     with:
       environment: dev
     secrets: inherit
